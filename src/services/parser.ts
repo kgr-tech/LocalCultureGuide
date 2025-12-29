@@ -338,7 +338,7 @@ export class KnowledgeBaseParser {
   /**
    * Load and parse the knowledge base file
    */
-  async loadKnowledgeBase(filePath: string = '/product.md'): Promise<ParsedData> {
+  async loadKnowledgeBase(filePath: string = './product.md'): Promise<ParsedData> {
     try {
       const response = await fetch(filePath);
       if (!response.ok) {

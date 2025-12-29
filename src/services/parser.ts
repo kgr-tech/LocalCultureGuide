@@ -338,12 +338,34 @@ export class KnowledgeBaseParser {
   /**
    * Load and parse the knowledge base file
    */
-  async loadKnowledgeBase(filePath: string = './product.md'): Promise<ParsedData> {
+  async loadKnowledgeBase(): Promise<ParsedData> {
     try {
-      const response = await fetch(filePath);
-      if (!response.ok) {
-        throw new Error(`Failed to load knowledge base: ${response.statusText}`);
+      // Try multiple paths for compatibility
+      const paths = [
+        '/LocalCultureGuide/product.md',  // GitHub Pages with base
+        '/product.md',                     // Root path
+        './product.md'                     // Relative path
+      ];
+      
+      let response: Response | null = null;
+      let lastError: Error | null = null;
+      
+      for (const path of paths) {
+        try {
+          response = await fetch(path);
+          if (response.ok) {
+            break;
+          }
+        } catch (error) {
+          lastError = error as Error;
+          continue;
+        }
       }
+      
+      if (!response || !response.ok) {
+        throw new Error(`Failed to load knowledge base from any path. Last error: ${lastError?.message || 'Unknown'}`);
+      }
+      
       const content = await response.text();
       const data = this.parseFile(content);
       
